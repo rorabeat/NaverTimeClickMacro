@@ -30,4 +30,19 @@
 
 ---
 
+## [2026-05-17] GitHub 저장소 및 PR 생성
+
+### 요청사항
+- GitHub 퍼블릭 저장소 생성 및 코드 push
+- develop → main PR 생성 (Draft)
+
+### 결정사항
+- 저장소: https://github.com/rorabeat/NaverTimeClickMacro (Public)
+- 브랜치 전략: `main` (안정) ← `develop` (개발) ← `feature/*` (기능)
+- `.gitignore`: `__pycache__/`, `.claude/`, `.venv/` 등 제외
+
+### 변경된 파일
+- `.gitignore` — 신규 생성
+- `memory-bank/history.md` — 본 항목 추가
+
 <!-- 새로운 이력은 이 줄 위에 추가 -->
