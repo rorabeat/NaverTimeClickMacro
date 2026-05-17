@@ -39,13 +39,16 @@
 
 ```
 NaverTimeClickMacro/
-├── main.py              # 진입점, tkinter 메인 루프
-├── time_sync.py         # 네이버 서버 시간 동기화
-├── coordinate.py        # 좌표 등록 및 pynput 리스너
-├── clicker.py           # pyautogui 클릭 및 정밀 대기
+├── main.py                   # 진입점, tkinter 메인 루프
+├── time_sync.py              # 네이버 서버 시간 동기화
+├── coordinate.py             # 좌표 등록 및 pynput 리스너
+├── clicker.py                # pyautogui 클릭 및 정밀 대기
 ├── ui/
-│   └── app_window.py    # tkinter UI 레이아웃
-└── requirements.txt
+│   ├── __init__.py
+│   └── app_window.py         # tkinter UI 레이아웃
+├── requirements.txt
+├── NaverTimeClickMacro.spec  # PyInstaller spec (collect_all)
+└── build.ps1                 # pip install + pyinstaller
 ```
 
 ---

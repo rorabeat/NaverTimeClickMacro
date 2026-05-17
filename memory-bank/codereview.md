@@ -1,6 +1,50 @@
 # codereview.md — 코드 리뷰 누적 결과
 
-코드 리뷰는 최신순(위)으로 누적 기록한다. 각 항목은 파일·함수 단위로 작성한다.
+코드 리뷰는 최신순(위)으로 기록한다. 각 항목은 파일·함수 단위로 작성한다.
+
+---
+
+## [2026-05-17] PyInstaller 배포 — exe 연쇄 ModuleNotFoundError (통합)
+
+### 리뷰어
+- AI 셀프 리뷰
+
+### 대상
+- `ui/app_window.py`, `NaverTimeClickMacro.spec`, `build.ps1`, 빌드 환경
+
+### 발견 사항
+| 구분 | 위치 | 내용 | 심각도 |
+|------|------|------|--------|
+| 버그 | `ui/app_window.py` L166 | `_begin_register` 들여쓰기 깨짐 → `invalid module ui.app_window` | 높음 |
+| 버그 | 빌드 Python 3.13 | `pyautogui`·`pynput` 미설치 → warn에 missing module | 높음 |
+| 운영 | `dist/*.exe` | exe 실행 중 재빌드 시 `PermissionError` | 중간 |
+| 개선 | `NaverTimeClickMacro.spec` | `collect_all('pyautogui'|'pynput')` 적용 | — |
+| 개선 | `build.ps1` | pip install + pyinstaller 일괄화 | — |
+
+### 조치
+- [x] `ui/__init__.py` 추가
+- [x] `app_window.py` 들여쓰기 복구
+- [x] spec `collect_all` + `build.ps1`
+- [x] `build.ps1` (Python 3.14) 빌드 성공 확인
+
+---
+
+## [2026-05-17] PyInstaller 배포 — exe ModuleNotFoundError (1차)
+
+### 리뷰어
+- AI 셀프 리뷰
+
+### 대상
+- `ui/` 패키지, `NaverTimeClickMacro.spec`
+
+### 발견 사항
+| 구분 | 위치 | 내용 | 심각도 |
+|------|------|------|--------|
+| 버그 | `ui/` | `__init__.py` 없음 → PyInstaller가 `ui.app_window` 미수집 | 높음 |
+| 개선 | `NaverTimeClickMacro.spec` | `pathex`·hiddenimports 보강 | — |
+
+### 조치
+- `ui/__init__.py` 추가 (후속: 들여쓰기·collect_all 추가 수정)
 
 ---
 

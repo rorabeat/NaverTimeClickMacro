@@ -163,7 +163,7 @@ class AppWindow:
         self._match_bar["value"] = rate
         self._match_var.set(f"{rate:.1f}%")
 
-def _begin_register(self, slot: int) -> None:
+    def _begin_register(self, slot: int) -> None:
         if coordinate.is_registering():
             coordinate.cancel_register()
         for btn in self._reg_buttons:

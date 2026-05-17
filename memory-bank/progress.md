@@ -4,6 +4,24 @@ AI가 완료한 작업을 최신순(위)으로 기록한다.
 
 ---
 
+## [2026-05-17 16:00:00] PyInstaller exe 배포 오류 수정 (통합)
+
+- **상태**: 완료
+- **작업 내용**: exe 실행 시 연쇄 ModuleNotFoundError 해결 및 빌드 자동화
+- **변경 파일**:
+  - `ui/__init__.py` — 패키지 인식
+  - `ui/app_window.py` — `_begin_register` 들여쓰기 복구 (invalid module 해소)
+  - `NaverTimeClickMacro.spec` — `pathex`, `collect_all('pyautogui'|'pynput')`
+  - `build.ps1` — `pip install` + PyInstaller 일괄 실행 (신규)
+- **원인 요약**:
+  1. `ui.app_window` — IndentationError로 PyInstaller가 모듈 제외
+  2. `pyautogui` / `pynput` — 빌드 Python에 미설치 또는 hiddenimports만으로 부족
+  3. `PermissionError` — exe 실행 중 재빌드 실패 (구 exe 유지)
+- **빌드 검증**: `.\build.ps1` (Python 3.14) → `dist/NaverTimeClickMacro.exe` 생성 성공
+- **권장 빌드**: `.\build.ps1` (PyInstaller와 동일한 Python에 requirements 설치 필수)
+
+---
+
 ## [2026-05-17] 프로젝트 초기 문서화
 
 ### 완료 항목
@@ -92,5 +110,44 @@ AI가 완료한 작업을 최신순(위)으로 기록한다.
 
 ### 다음 단계
 - 없음 (전체 Phase 완료). 실제 사용 피드백에 따라 개선 예정.
+
+## [2026-05-17] UI 개선 작업
+
+### 완료 항목
+
+| 변경 내용 | 파일 | 세부사항 |
+|-----------|------|----------|
+| 오프셋 입력 방식 교체 | `ui/app_window.py` | `tk.Scale` → `tk.Entry` + 적용 버튼, Enter 키 지원, 범위 클램핑 |
+| 현재 적용값 표시 | `ui/app_window.py` | "현재: +120 ms" 형태 레이블 추가 |
+| 좌표 등록 조건 완화 | `coordinate.py`, `ui/app_window.py` | `all_registered()` → `any_registered()`, 1개 이상이면 시작 가능 |
+| 일치율 실시간 미리보기 | `ui/app_window.py` | `trace_add("write", ...)` 로 타이핑 중 즉시 반영 |
+| `_update_match` 개선 | `ui/app_window.py` | `preview_ms` 파라미터 추가, 미적용 값도 미리보기 가능 |
+
+### 삭제된 기능
+- 자동 일치율 조정 버튼 (10초 서버 다중 동기화 → 유의미한 효과 없음으로 판단)
+
+## [2026-05-17] PyInstaller 단독 exe 빌드
+
+### 완료 항목
+
+| 항목 | 내용 |
+|------|------|
+| 빌드 도구 | PyInstaller 6.18.0 |
+| 출력 파일 | `dist/NaverTimeClickMacro.exe` (9.8 MB) |
+| 옵션 | `--onefile --windowed --collect-all ui` |
+| `.gitignore` | `*.spec` 추가 (`dist/`, `build/` 는 기존 등록) |
+| 검증 | `ui` 패키지 포함 완료, 콘솔 창 없음 |
+
+### 최종 빌드 명령 (수정됨)
+```bash
+pyinstaller --onefile --windowed --name "NaverTimeClickMacro" \
+  --hidden-import "ui" --hidden-import "ui.app_window" main.py
+```
+
+### 특징
+- Python 미설치 환경에서도 단독 실행 가능
+- `--hidden-import` 으로 로컬 `ui` 패키지 명시적 포함 (중요)
+- `--windowed` 로 콘솔 창 제외
+- `ui.app_window` 모듈 누락 오류 해결
 
 <!-- 새로운 진행 이력은 이 줄 위에 추가 -->
