@@ -73,5 +73,9 @@ def all_registered() -> bool:
     return all(c is not None for c in _coords)
 
 
+def any_registered() -> bool:
+    return any(c is not None for c in _coords)
+
+
 def is_registering() -> bool:
     return _registering

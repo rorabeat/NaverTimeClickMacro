@@ -53,14 +53,14 @@ class AppWindow:
         row1 = tk.Frame(sync_frame)
         row1.pack(fill="x", padx=8, pady=2)
         tk.Label(row1, text="오프셋 조정(ms):").pack(side="left")
-        self._offset_scale = tk.Scale(
-            row1, from_=self.OFFSET_MIN, to=self.OFFSET_MAX,
-            orient="horizontal", length=260, resolution=1,
-            command=self._on_offset_changed,
-            showvalue=True,
-        )
-        self._offset_scale.set(0)
-        self._offset_scale.pack(side="left", padx=6)
+        self._offset_var = tk.StringVar(value="0")
+        self._offset_entry = tk.Entry(row1, textvariable=self._offset_var, width=8, justify="center")
+        self._offset_entry.pack(side="left", padx=6)
+        self._offset_entry.bind("<Return>", lambda e: self._apply_offset())
+        self._offset_var.trace_add("write", self._on_offset_var_changed)
+        tk.Button(row1, text="적용", width=5, command=self._apply_offset).pack(side="left")
+        self._offset_applied_var = tk.StringVar(value="현재: 0 ms")
+        tk.Label(row1, textvariable=self._offset_applied_var, fg="gray").pack(side="left", padx=6)
 
         row2 = tk.Frame(sync_frame)
         row2.pack(fill="x", padx=8, pady=(2, 6))
@@ -131,23 +131,39 @@ class AppWindow:
         def run():
             _, ok = time_sync.sync()
             self._manual_offset_ms = 0.0
-            self.root.after(0, lambda: self._offset_scale.set(0))
+            self.root.after(0, lambda: self._offset_var.set("0"))
+            self.root.after(0, lambda: self._offset_applied_var.set("현재: 0 ms"))
             msg = "동기화 완료" if ok else "동기화 실패 (로컬 시간 사용)"
             self.root.after(0, lambda: self._synced_var.set(msg))
             self.root.after(0, self._update_match)
 
         threading.Thread(target=run, daemon=True).start()
 
-    def _on_offset_changed(self, value: str) -> None:
+    def _on_offset_var_changed(self, *_) -> None:
+        try:
+            self._update_match(float(int(self._offset_var.get())))
+        except ValueError:
+            self._update_match()
+
+    def _apply_offset(self) -> None:
+        try:
+            value = int(self._offset_var.get())
+        except ValueError:
+            self._offset_var.set(str(int(self._manual_offset_ms)))
+            return
+        value = max(self.OFFSET_MIN, min(self.OFFSET_MAX, value))
+        self._offset_var.set(str(value))
         self._manual_offset_ms = float(value)
+        self._offset_applied_var.set(f"현재: {value:+d} ms")
         self._update_match()
 
-    def _update_match(self) -> None:
-        rate = time_sync.match_rate(self._manual_offset_ms)
+    def _update_match(self, preview_ms: float | None = None) -> None:
+        ms = preview_ms if preview_ms is not None else self._manual_offset_ms
+        rate = time_sync.match_rate(ms)
         self._match_bar["value"] = rate
         self._match_var.set(f"{rate:.1f}%")
 
-    def _begin_register(self, slot: int) -> None:
+def _begin_register(self, slot: int) -> None:
         if coordinate.is_registering():
             coordinate.cancel_register()
         for btn in self._reg_buttons:
@@ -170,8 +186,8 @@ class AppWindow:
             self._start_btn.config(text="매크로 시작", bg="#0066cc")
             return
 
-        if not coordinate.all_registered():
-            self._status_var.set("좌표 3개를 모두 등록하세요")
+        if not coordinate.any_registered():
+            self._status_var.set("좌표를 1개 이상 등록하세요")
             return
 
         target_ms = self._get_target_ms()
@@ -218,7 +234,7 @@ class AppWindow:
         return int(value) <= maxval
 
     def _refresh_start_btn(self) -> None:
-        ready = coordinate.all_registered() and not clicker.is_running()
+        ready = coordinate.any_registered() and not clicker.is_running()
         self._start_btn.config(state="normal" if ready else "disabled")
 
     def _tick(self) -> None:
