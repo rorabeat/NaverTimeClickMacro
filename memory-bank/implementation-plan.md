@@ -14,6 +14,7 @@
 - [x] Phase 4 완료 (2026-05-17)
 - [x] Phase 5 완료 (2026-05-17)
 - [x] Phase 6 완료 (2026-05-17)
+- [x] Phase 7 완료 (2026-05-17) — PyInstaller exe 배포
 
 ---
 
@@ -77,10 +78,22 @@
 
 ---
 
+## Phase 7 — PyInstaller exe 배포
+
+| # | 태스크 | 상태 | 비고 |
+|---|--------|------|------|
+| 7.1 | `ui/__init__.py` 및 spec `pathex` | 완료 | 2026-05-17 |
+| 7.2 | `app_window.py` 들여쓰기 수정 | 완료 | invalid module 해소 |
+| 7.3 | `collect_all` pyautogui·pynput | 완료 | 2026-05-17 |
+| 7.4 | `build.ps1` 빌드 스크립트 | 완료 | pip + pyinstaller |
+| 7.5 | exe 빌드·실행 검증 | 완료 | Python 3.14 `build.ps1` 성공 |
+
+---
+
 ## 추가 요청사항
 
 _추가 요청이 있을 경우 아래에 기록하고 해당 Phase에 태스크를 추가한다._
 
 | 날짜 | 요청 내용 | 반영 위치 | 상태 |
 |------|-----------|-----------|------|
-| — | — | — | — |
+| 2026-05-17 | exe ModuleNotFoundError 연쇄 수정 | Phase 7 | 완료 |

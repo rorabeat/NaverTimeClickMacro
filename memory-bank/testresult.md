@@ -23,7 +23,26 @@
 
 ## 테스트 결과 이력
 
-_소스코드 구현 후 테스트 결과가 추가됩니다._
+## 🧪 [2026-05-17 16:00:00] PyInstaller exe 빌드 (build.ps1)
+
+- **테스트 유형**: 수동(Manual) / 빌드 검증
+- **대상**: `build.ps1`, `NaverTimeClickMacro.spec`, `dist/NaverTimeClickMacro.exe`
+- **결과**: ✅ 통과 (빌드), ⚠️ exe 런타임 GUI는 사용자 환경에서 최종 확인 필요
+
+### 상세 결과
+| 테스트 항목 | 결과 | 비고 |
+|------------|------|------|
+| `pip install -r requirements.txt` | ✅ | Python 3.14, pyautogui·pynput 설치 확인 |
+| PyInstaller Analysis | ✅ | pyautogui·pynput hook 및 hidden import 분석 |
+| EXE 생성 | ✅ | `dist/NaverTimeClickMacro.exe` |
+| warn에 ui.app_window invalid | ✅ 해소 | 들여쓰기 수정 후 |
+| warn에 pyautogui missing | ✅ 해소 | collect_all + 동일 Python 빌드 |
+
+### 실패 이력 (수정 완료)
+- **ui.app_window**: IndentationError → spec에서 invalid module
+- **pyautogui**: 빌드 env 미설치 → runtime ModuleNotFoundError
+
+---
 
 ### 결과 기록 형식
 
